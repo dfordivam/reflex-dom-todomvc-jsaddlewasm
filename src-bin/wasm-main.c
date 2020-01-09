@@ -1,8 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "HsFFI.h"
-#include "AppMain_stub.h"
 #include <unistd.h>
+
+// Copied from "AppMain_stub.h"
+
+extern HsStablePtr hsAppInit(void);
+extern HsInt64 hsAppExecStep(HsStablePtr a1, HsPtr a2, HsInt a3);
+extern HsPtr hsMalloc(HsInt a1);
 
 HsStablePtr hsEnvPtr = NULL;
 

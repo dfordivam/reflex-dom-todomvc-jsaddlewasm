@@ -1,0 +1,42 @@
+Name: reflex-todomvc
+Version: 0.1
+Synopsis: Functional Reactive TodoMVC
+Description: An implementation of the TodoMVC specification using the Reflex-DOM functional reactive DOM library
+License: BSD3
+License-file: LICENSE
+Author: Ryan Trinkle
+Maintainer: ryan.trinkle@gmail.com
+Stability: Experimental
+Category: FRP
+Build-type: Simple
+Cabal-version: >=1.8
+
+library
+  hs-source-dirs: src
+  build-depends:
+    base,
+    reflex,
+    ghcjs-dom == 0.9.*,
+    reflex-dom-core,
+    containers,
+    text,
+    jsaddle-wasm,
+    reflex-dom,
+    mtl
+  exposed-modules:
+    Reflex.TodoMVC
+    AppMain
+  ghc-prof-options: -fprof-auto
+  ghc-options:  -Wall -fwarn-tabs -O
+
+executable reflex-todomvc
+  hs-source-dirs: src-bin
+  main-is: wasm-main.c
+  other-modules:
+  -- c-sources: wasm-main.c
+  build-depends:
+    base,
+    ghcjs-dom,
+    reflex-todomvc
+  ghc-prof-options: -fprof-auto
+  ghc-options: -Wall -fwarn-tabs -O -optl -Wl,--export,jsaddleBufferAlloc -optl -Wl,--export,appExecStep -no-hs-main

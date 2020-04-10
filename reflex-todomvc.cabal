@@ -20,12 +20,17 @@ library
     reflex-dom-core,
     containers,
     text,
-    jsaddle-wasm,
     reflex-dom,
+    aeson,
+    binary,
+    bytestring,
+    jsaddle,
+    lens,
     mtl
   exposed-modules:
     Reflex.TodoMVC
     AppMain
+    Language.Javascript.JSaddle.Wasm
   ghc-prof-options: -fprof-auto
   ghc-options:  -Wall -fwarn-tabs -O
 

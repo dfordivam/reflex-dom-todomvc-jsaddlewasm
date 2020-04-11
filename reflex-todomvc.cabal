@@ -44,4 +44,4 @@ executable reflex-todomvc
     ghcjs-dom,
     reflex-todomvc
   ghc-prof-options: -fprof-auto
-  ghc-options: -Wall -fwarn-tabs -O -optl -Wl,--export,jsaddleBufferAlloc -optl -Wl,--export,appExecStep -no-hs-main
+  ghc-options: -Wall -fwarn-tabs -O -optl -Wl,--export,jsaddleBufferAlloc -optl -Wl,--export,appExecSync -optl -Wl,--export,appExecStep -no-hs-main

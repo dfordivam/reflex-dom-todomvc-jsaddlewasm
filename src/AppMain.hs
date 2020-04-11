@@ -20,6 +20,11 @@ foreign export ccall hsAppExecStep :: StablePtr HsEnv -> CString -> Int -> IO In
 hsAppExecStep :: StablePtr HsEnv -> CString -> Int -> IO Int64
 hsAppExecStep = jsaddleExecStep
 
+foreign export ccall hsAppExecSync :: StablePtr HsEnv -> CString -> Int -> IO Int64
+
+hsAppExecSync :: StablePtr HsEnv -> CString -> Int -> IO Int64
+hsAppExecSync = jsaddleExecSync
+
 foreign export ccall hsMalloc :: Int -> IO CString
 
 hsMalloc :: Int -> IO CString

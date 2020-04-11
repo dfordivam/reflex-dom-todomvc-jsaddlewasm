@@ -7,6 +7,7 @@
 
 extern HsStablePtr hsAppInit(void);
 extern HsInt64 hsAppExecStep(HsStablePtr a1, HsPtr a2, HsInt a3);
+extern HsInt64 hsAppExecSync(HsStablePtr a1, HsPtr a2, HsInt a3);
 extern HsPtr hsMalloc(HsInt a1);
 
 HsStablePtr hsEnvPtr = NULL;
@@ -24,6 +25,11 @@ char* jsaddleBufferAlloc(int size) {
 
 int appExecStep (int dataLen) {
   int ret = hsAppExecStep (hsEnvPtr, jsaddleBuffer, dataLen);
+  return ret;
+}
+
+int appExecSync (int dataLen) {
+  int ret = hsAppExecSync (hsEnvPtr, jsaddleBuffer, dataLen);
   return ret;
 }
 

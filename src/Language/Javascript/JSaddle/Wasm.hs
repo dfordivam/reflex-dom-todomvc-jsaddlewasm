@@ -10,6 +10,7 @@ module Language.Javascript.JSaddle.Wasm (
   , run2
   , jsaddleInit
   , jsaddleExecStep
+  , jsaddleExecSync
   , HsEnv
   ) where
 
@@ -100,9 +101,10 @@ processIncomingMsgs cont msgs = do
     _ -> processIncomingMsgs cont rest
 
 data HsEnv = HsEnv
-  { a :: MVar [Batch]
-  , b :: MVar Results
-  , c :: (Results -> IO ())
+  { _hsEnv_outgoungMessages :: MVar [Batch]
+  , _hsEnv_incomingMessages :: MVar Results
+  , _hsEnv_processResult :: (Results -> IO ())
+  , _hsEnv_processSyncResult :: (Results -> IO (Batch))
   }
 
 
@@ -120,14 +122,14 @@ jsaddleInit _ entryPoint = do
       tryPutMVar lockInit ()
       pure ()
 
-  (processResult, _, start) <-
+  (processResult, processSyncResult, start) <-
     runJavaScript sendBatch entryPoint
   putStrLn "runJavaScript done"
 
   forkIO $ start
   takeMVar lockInit
   putStrLn "start done"
-  newStablePtr $ HsEnv outgoingMessages incomingMessage processResult
+  newStablePtr $ HsEnv outgoingMessages incomingMessage processResult processSyncResult
 
 -- foreign export capi jsaddleExecStep :: StablePtr HsEnv -> CString -> Int -> IO Int64
 
@@ -135,7 +137,7 @@ jsaddleInit _ entryPoint = do
 jsaddleExecStep :: StablePtr HsEnv -> CString -> Int -> IO Int64
 jsaddleExecStep envPtr dataPtr dataLen = do
   putStrLn "Doing jsaddleExecStep"
-  HsEnv outgoingMessages incomingMessage processResult <- deRefStablePtr envPtr
+  HsEnv outgoingMessages incomingMessage processResult _ <- deRefStablePtr envPtr
   when (dataLen /= 0) $ do
     bs <- BS8.packCStringLen (dataPtr, dataLen)
     case decode (BS.fromStrict bs) of
@@ -156,3 +158,17 @@ jsaddleExecStep envPtr dataPtr dataLen = do
           BSIO.useAsCStringLen (BS.toStrict outData) $ \(ptr, len) -> copyBytes dataPtr ptr len
           pure $ BS.length outData
   loop 10
+
+jsaddleExecSync :: StablePtr HsEnv -> CString -> Int -> IO Int64
+jsaddleExecSync envPtr dataPtr dataLen = do
+  putStrLn "Doing jsaddleExecSync"
+  yield
+  HsEnv outgoingMessages incomingMessage _ processSyncResult <- deRefStablePtr envPtr
+  bs <- BS8.packCStringLen (dataPtr, dataLen)
+  m <- case decode (BS.fromStrict bs) of
+    Nothing -> error $ "jsaddle Sync Results decode failed : "
+    Just !r  -> processSyncResult r
+  let outData = encode m
+  putStrLn $ "sync outmsgsize: " <> show (BS.length outData)
+  BSIO.useAsCStringLen (BS.toStrict outData) $ \(ptr, len) -> copyBytes dataPtr ptr len
+  pure $ BS.length outData

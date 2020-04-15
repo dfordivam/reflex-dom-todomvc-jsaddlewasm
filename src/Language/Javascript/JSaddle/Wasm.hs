@@ -129,6 +129,9 @@ jsaddleInit _ entryPoint = do
   forkIO $ start
   takeMVar lockInit
   putStrLn "start done"
+  forkIO $ forever $ do
+    threadDelay (5*1000*1000)
+    putStrLn "JSaddle-Wasm heartbeat"
   newStablePtr $ HsEnv outgoingMessages incomingMessage processResult processSyncResult
 
 -- foreign export capi jsaddleExecStep :: StablePtr HsEnv -> CString -> Int -> IO Int64

@@ -139,7 +139,7 @@ jsaddleInit _ entryPoint = do
 -- jsaddleExecStep reads data from dataPtr, and writes back to same place
 jsaddleExecStep :: StablePtr HsEnv -> CString -> Int -> IO Int64
 jsaddleExecStep envPtr dataPtr dataLen = do
-  putStrLn "Doing jsaddleExecStep"
+  -- putStrLn "Doing jsaddleExecStep"
   HsEnv outgoingMessages incomingMessage processResult _ <- deRefStablePtr envPtr
   when (dataLen /= 0) $ do
     bs <- BS8.packCStringLen (dataPtr, dataLen)
@@ -157,14 +157,14 @@ jsaddleExecStep envPtr dataPtr dataLen = do
         (Nothing, False) -> pure 0
         (Just m, _) -> do
           let outData = encode m
-          putStrLn $ "outmsgsize: " <> show (BS.length outData)
+          -- putStrLn $ "outmsgsize: " <> show (BS.length outData)
           BSIO.useAsCStringLen (BS.toStrict outData) $ \(ptr, len) -> copyBytes dataPtr ptr len
           pure $ BS.length outData
   loop 10
 
 jsaddleExecSync :: StablePtr HsEnv -> CString -> Int -> IO Int64
 jsaddleExecSync envPtr dataPtr dataLen = do
-  putStrLn "Doing jsaddleExecSync"
+  -- putStrLn "Doing jsaddleExecSync"
   yield
   HsEnv outgoingMessages incomingMessage _ processSyncResult <- deRefStablePtr envPtr
   bs <- BS8.packCStringLen (dataPtr, dataLen)
@@ -172,6 +172,6 @@ jsaddleExecSync envPtr dataPtr dataLen = do
     Nothing -> error $ "jsaddle Sync Results decode failed : "
     Just !r  -> processSyncResult r
   let outData = encode m
-  putStrLn $ "sync outmsgsize: " <> show (BS.length outData)
+  -- putStrLn $ "sync outmsgsize: " <> show (BS.length outData)
   BSIO.useAsCStringLen (BS.toStrict outData) $ \(ptr, len) -> copyBytes dataPtr ptr len
   pure $ BS.length outData

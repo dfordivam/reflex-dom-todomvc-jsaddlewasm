@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "HsFFI.h"
 #include <unistd.h>
+#include "Rts.h"
 
 // Copied from "AppMain_stub.h"
 
@@ -38,7 +39,10 @@ HsBool mylib_init(void){
   char *argv[] = { NULL };
   char **pargv = argv;
 
-  hs_init(&argc, &pargv);
+  RtsConfig conf = defaultRtsConfig;
+  /* conf.rts_opts = "-DS -DG"; */
+  conf.keep_cafs = true;
+  hs_init_ghc(&argc, &pargv, conf);
 
   hsEnvPtr = hsAppInit();
 
